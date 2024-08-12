@@ -10,6 +10,8 @@ vai palaist `run.bat` datni
 
 # Lietones uzstadišana
 
+**Nepeiciešams NPM - Pakešu menedžmenta rīks**
+
 Lai uzstādītu lietotni ir nepieciešams lejupielādēt git repositoriju, izmantojot
 
 ```cmd
