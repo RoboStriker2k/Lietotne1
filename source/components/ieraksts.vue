@@ -1,54 +1,57 @@
 <template>
   <div id="postcntbox">
-    <p>Atrasto ierakstu skaits datubāze: {{ atrastoierakstuskaits }}</p>
+    <p>Atrasto ierakstu skaits datubāze: {{ searchstates.postcount }}</p>
   </div>
   <div v-if="ieraksti.length == 0">Ierakstu nav</div>
   <div id="dzest">
-    <button v-if="!deletemarker & (ieraksti.length > 0)" v-on:click="deleteselector">
+    <button v-if="!searchstates.deletemarker & (ieraksti.length > 0)" v-on:click="deleteselector">
       Ierakstu atlase
     </button>
-    <button v-if="deletemarker" v-on:click="deletefunction">Dzest ierakstus</button>
-    <button v-if="deletemarker" v-on:click="deleteselector">Atcelt dzešanu</button>
+    <button v-if="searchstates.deletemarker" v-on:click="deletefunction">Dzest ierakstus</button>
+    <button v-if="searchstates.deletemarker" v-on:click="deleteselector">Atcelt dzešanu</button>
   </div>
   <div class="iecontent">
     <div v-for="post in ieraksti">
       <div class="ieraksts" v-bind:id="post.idposts">
-        <input v-if="deletemarker" class="checkbox" type="CHECKBOX" v-bind:id="post.idposts" />
+        <input
+          v-if="searchstates.deletemarker"
+          class="checkbox"
+          type="CHECKBOX"
+          v-bind:id="post.idposts"
+        />
         <h1>{{ post.title }}</h1>
         <P>{{ post.pdesc }}</P>
-        <P v-if="DEBUGVAL">{{ post.idposts }}</P>
-
         <img
           v-if="post.imgpath != null"
           :src="`http://localhost:3000/getfoto/${post.imgpath}`"
           alt="Image"
         />
+        <Multiimgcomp v-if="post.imgarr != null" :imgarr="post.imgarr" />
         <div><button class="btn" v-on:click="editfn(post.idposts)">Labot</button></div>
       </div>
     </div>
   </div>
   <div id="pagenum">
-    <button v-on:click="decpagebutton(), getposts(getpostammount, postbookmark)">Back</button>
-    <h1 id="pagecount">{{ postbookmark + 1 }}/{{ pagecount + 1 }}</h1>
-    <button v-on:click="incpagebutton(), getposts(getpostammount, postbookmark)">Next</button>
+    <button v-on:click="decpagebutton(), getposts(searchstates.postammount, searchstates.bookmark)">
+      Back
+    </button>
+    <h1 id="pagecount">{{ searchstates.bookmark + 1 }}/{{ searchstates.pagecount + 1 }}</h1>
+    <button v-on:click="incpagebutton(), getposts(searchstates.postammount, searchstates.bookmark)">
+      Next
+    </button>
   </div>
 </template>
 
 <script setup>
 import axios from 'axios'
+import Multiimgcomp from './multiimgcomp.vue'
 </script>
 <script>
-let getpostammount = 5
-var postbookmark = 0
-var postcount = 0
-var pagecount = 0
-var deletemarker = false
 var deleteselection = []
-var DEBUGVAL = false
-var defaultsearchtext = ''
 
 export default {
-  props: ['deletemarker', 'deleteselection'],
+  props: ['deleteselection'],
+  components: { Multiimgcomp },
   expose: ['dosearch'],
   emits: ['update', 'editfn'],
   setup() {
@@ -56,98 +59,92 @@ export default {
   },
 
   data() {
+    const searchstates = {
+      searchtext: '',
+      postammount: 5,
+      bookmark: 0,
+      deletemarker: false,
+      pagecount: 0,
+      totalpostcount: 0,
+      defaultsearchtext: '',
+      defaultpostammount: 5,
+      defaultbookmark: 0,
+      postcount: 0
+    }
+
     const ieraksti = []
     const imgsrc = ''
-    let atrastoierakstuskaits = 0
+
     return {
       ieraksti,
       imgsrc,
-      atrastoierakstuskaits
+      searchstates
     }
   },
 
   mounted() {
-    this.getpostcount()
     this.update()
 
-    this.getposts(getpostammount, postbookmark)
+    this.getposts(this.searchstates.postammount, this.searchstates.bookmark)
   },
 
   methods: {
     editfn(id) {
       this.$emit('editfn', id)
     },
-    async getposts(ammount, offset) {
-      if (!ammount) {
-        ammount = getpostammount
-      }
-      if (!offset) {
-        offset = 0
-      }
+    async getposts(
+      ammount = this.searchstates.defaultpostammount,
+      offset = this.searchstates.defaultbookmark
+    ) {
       let searchtextval = document.getElementById('searchbar').value
 
-      if (searchtextval == '') {
-        const response = await axios.get(
-          `http://localhost:3000/api/getposts?ammount=${ammount}&offset=${offset}`
-        )
-        this.ieraksti = response.data.posts
-      } else {
-        const formData1 = new FormData()
-        formData1.append('searchtext', searchtextval)
-        formData1.append('ammount', ammount)
-        formData1.append('offset', offset)
-        console.log(searchtextval)
-        const response2 = axios
-          .post('http://localhost:3000/search', formData1)
+      const formData1 = new FormData()
+      formData1.append('searchtext', searchtextval)
+      formData1.append('ammount', ammount)
+      formData1.append('offset', offset)
 
-          .catch(function (error) {
-            console.log(error)
-          })
-          .then(function (response) {
-            console.log(response)
-            return response
-          })
-          .then((response) => {
-            this.ieraksti = response.data.posts
-            this.atrastoierakstuskaits = response.data.count
-            this.getpostcount(response.data.count)
-          })
-        this.$emit('update')
-      }
+      const response2 = axios
+        .post('http://localhost:3000/search', formData1)
+
+        .catch(function (error) {
+          console.log(error)
+        })
+        .then(function (response) {
+          console.log(response)
+          return response
+        })
+        .then((response) => {
+          this.ieraksti = response.data.posts
+          this.getpostcount(response.data.count)
+        })
+      this.$emit('update')
     },
     async getpostcount(count) {
-      if (!count) {
-        const response = await axios.get(`http://localhost:3000/api/postscount/`)
-        postcount = response.data.posts[0].postscount
-      }
+      this.searchstates.postcount = count
 
-      if (count) {
-        postcount = count
-      }
-      pagecount = Math.ceil(postcount / getpostammount) - 1
+      this.searchstates.pagecount =
+        Math.ceil(this.searchstates.postcount / this.searchstates.postammount) - 1
     },
 
     incpagebutton() {
-      if (postbookmark < pagecount) {
-        postbookmark++
+      if (this.searchstates.bookmark < this.searchstates.pagecount) {
+        this.searchstates.bookmark++
       }
     },
 
     decpagebutton() {
-      if (postbookmark > 0) {
-        postbookmark--
+      if (this.searchstates.bookmark > 0) {
+        this.searchstates.bookmark--
       }
     },
 
     update() {
-      this.getpostcount()
-      this.getposts(getpostammount, postbookmark)
-
-      this.$emit('update')
+      this.getposts(this.searchstates.postammount, this.searchstates.bookmark)
+      // this.$emit('update')
     },
     deleteselector() {
-      deletemarker = !deletemarker
-      this.update()
+      this.searchstates.deletemarker = !this.searchstates.deletemarker
+      // this.update()
     },
 
     deletefunction() {
@@ -176,8 +173,8 @@ export default {
       }
 
       this.update()
-      if (postbookmark > pagecount) {
-        this.postbookmark = pagecount
+      if (this.searchstates.bookmark > this.searchstates.pagecount) {
+        this.searchstates.bookmark = this.searchstates.pagecount
       }
     },
 
