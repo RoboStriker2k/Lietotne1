@@ -1,10 +1,10 @@
 <template>
   <div id="multiimgdisplay">
     <div id="multiimg">
-      <div v-for="img in imgarr.images">
+      <div v-for="img of imgarr.images">
         <img :src="`${imgurl + img}`" />
 
-        <input class="multiimgcheck" v-if="editstatus" type="checkbox" :id="{ img }" />
+        <input class="multiimgcheck" v-if="editstatus" type="checkbox" :id="`${img}`" />
       </div>
     </div>
   </div>

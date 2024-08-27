@@ -21,8 +21,8 @@
       <div class="editier">
         <h1>Priekšskats</h1>
         <div class="editieraksts" id="{{ item.idposts }}">
-          <h1 id="previewtitle">{{ item.title }}</h1>
-          <p id="previewdesc">{{ item.pdesc }}</p>
+          <h1 id="previewtitle">{{ PState.newtitle }}</h1>
+          <p id="previewdesc">{{ PState.newpdesc }}</p>
           <img
             v-if="item.imgpath != null"
             id="previewimg"
@@ -89,10 +89,15 @@ export default {
     },
     hide() {
       this.PState.viewstatus = false
-    },
-    exit() {
-      this.PState.viewstatus = false
-      this.$emit('updateview')
+      this.PState = {
+        ieraksti: [],
+        newtitle: '',
+        newpdesc: '',
+        files: [],
+        preview: [],
+        viewstatus: false
+      }
+      this.editid.idposts = null
     },
     updatetitle(event) {
       this.PState.newtitle = event.target.value
@@ -145,11 +150,14 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           this.PState.ieraksti = data.posts
+          // noņem references no iegūtā datu objekta
+          this.PState.newtitle = toString(this.PState.ieraksti.title)
+          this.PState.newpdesc = toString(this.PState.ieraksti.pdesc)
         })
         .catch((error) => {
           console.error('Error:', error)
         })
-      if (this.Pstate.ieraksti != null) {
+      if (this.PState.ieraksti.length > 0) {
         this.PState.viewstatus = true
       }
     },
@@ -187,7 +195,6 @@ export default {
         }
       }
       reader.readAsDataURL(img)
-      console.log(imgarr)
       this.PState.preview = imgarr
     },
 
@@ -195,6 +202,7 @@ export default {
       console.log('removing checked')
       let selectledelate = document.querySelectorAll('input[type=checkbox]:checked')
       let deleteform = new FormData()
+      console.log('ran', selectledelate)
       let removeflag = true
       let replaceflag = false
       let imgarr = []
@@ -220,11 +228,12 @@ export default {
       }
 
       if (imgarr != null) {
+        console.log(JSON.stringify(imgarr))
         deleteform.append('imgarr', JSON.stringify(imgarr))
       }
       deleteform.append('replaceflag', replaceflag.toString())
       deleteform.append('removeflag', removeflag.toString())
-      deleteform.append('idpost', editid.toString())
+      deleteform.append('idpost', this.editid.idposts)
       fetch(`http://localhost:3000/api/editpost/`, {
         method: 'POST',
         body: deleteform
