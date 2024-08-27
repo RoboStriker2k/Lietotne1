@@ -26,7 +26,7 @@
       <p>Lietotnes ieraksti</p>
       <div id="dyncontent">
         <ieraksts @update="Updateview" @editfn="editfn" ref="ier" />
-        <editcomp :Posttatus="editpostdata" ref="edit" @update="Updateview" />
+        <editcomp :editid="editpostdata" ref="edit" @update="Updateview" />
       </div>
     </div>
   </div>

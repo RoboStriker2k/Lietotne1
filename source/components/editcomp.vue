@@ -1,34 +1,51 @@
 <template>
-  <div v-if="viewstatus" id="edit" class="editview">
-    <div v-if="CIER.length == 0">Ierakstu nav</div>
-    <div v-if="CIER.length != 0" v-for="item in CIER">
+  <div v-if="PState.viewstatus" id="edit" class="editview">
+    <div v-if="PState.ieraksti.length == 0">Ierakstu nav</div>
+    <div v-if="PState.ieraksti.length != 0" v-for="item in PState.ieraksti">
       <div>
         <h1>Pievienot</h1>
-        <p>Ieraksta virsraksts</p>
-        <input id="edittitle" type="text" :placeholder="[[item.title]]" @change="updatetitle" />
-        <p>Ieraksta apraksts</p>
-        <input id="editdesc" type="text" :placeholder="[[item.pdesc]]" @change="updatedesc" />
         <div>
-          <p>Ieraksta attels (var nepievienot)</p>
+          <label for="edittitle">Ieraksta virsraksts</label>
+          <input id="edittitle" type="text" :placeholder="[[item.title]]" @change="updatetitle" />
+        </div>
+        <div>
+          <label for="editdesc">Ieraksta apraksts</label>
+          <input id="editdesc" type="text" :placeholder="[[item.pdesc]]" @change="updatedesc" />
+        </div>
+        <div>
+          <p>Pievienot attēlus</p>
           <img id="editpreview" />
-          <input id="editupl" type="file" @change="onFileSelected" />
+          <input id="editupl" type="file" multiple @change="onMultipleFilesSelected" />
         </div>
       </div>
-
       <div class="editier">
         <h1>Priekšskats</h1>
-        <div class="ieraksts" id="{{ item.idposts }}">
+        <div class="editieraksts" id="{{ item.idposts }}">
           <h1 id="previewtitle">{{ item.title }}</h1>
           <p id="previewdesc">{{ item.pdesc }}</p>
           <img
             v-if="item.imgpath != null"
             id="previewimg"
-            :src="`http://localhost:3000/getfoto/${item.imgpath}`"
+            :src="`http://localhost:3000/getfoto/?file=${item.imgpath}`"
           />
+          <Multiimgcomp v-if="item.imgarr != null" :imgarr="item.imgarr" :editstatus="true" />
+          <div class="editgrid" v-if="PState.preview.length > 0" v-for="item in PState.preview">
+            <img id="preview" :src="item" />
+            <button
+              class="removebtn"
+              type="button"
+              @click="removefromupload(PState.preview.indexOf(item))"
+            >
+              X
+            </button>
+          </div>
         </div>
       </div>
 
       <div>
+        <button type="button" @click="removechecked()">
+          Dzēst atzīmētos attēlus neatgriezeniski
+        </button>
         <button type="button" @click="editfn()">Labot ierakstu</button>
         <button type="button" @click="hide()">Atcelt</button>
         <button type="button" @click="hide()">Aizvert</button>
@@ -37,25 +54,28 @@
   </div>
 </template>
 <script>
+import Multiimgcomp from './multiimgcomp.vue'
+
 export default {
   name: 'editcomp',
-  props: ['Posttatus'],
-  components: {},
+  props: ['editid'],
+  components: { Multiimgcomp },
   emits: ['updateview'],
 
   setup() {
     return {}
   },
   data() {
-    const IER = []
-    const CIER = []
-    const file = null
-    const viewstatus = false
+    const PState = {
+      ieraksti: [],
+      newtitle: '',
+      newpdesc: '',
+      files: [],
+      preview: [],
+      viewstatus: false
+    }
     return {
-      IER,
-      CIER,
-      file,
-      viewstatus
+      PState
     }
   },
 
@@ -64,42 +84,45 @@ export default {
   },
   methods: {
     show() {
-      this.Posttatus.status = true
-      this.viewstatus = true
+      this.PState.viewstatus = true
       this.getpost()
     },
     hide() {
-      this.viewstatus = false
+      this.PState.viewstatus = false
     },
     exit() {
-      this.viewstatus = false
+      this.PState.viewstatus = false
       this.$emit('updateview')
     },
     updatetitle(event) {
-      this.CIER[0].title = event.target.value
+      this.PState.newtitle = event.target.value
     },
     updatedesc(event) {
-      this.CIER[0].pdesc = event.target.value
+      this.PState.newpdesc = event.target.value
     },
 
     editfn() {
-      let oldtitle = this.IER[0].title
-      let oldpdesc = this.IER[0].pdesc
-      let oldimgpath = this.IER[0].imgpath
-      let newtitle = this.CIER[0].title
-      let newpdesc = this.CIER[0].pdesc
-      console.log(oldtitle, oldpdesc, oldimgpath, newtitle, newpdesc)
+      console.log(
+        this.PState.ieraksti.title,
+        this.PState.ieraksti.pdesc,
+        this.PState.newtitle,
+        this.PState.newpdesc
+      )
       let formdata = new FormData()
-      if (oldtitle != newtitle) {
-        formdata.append('title', newtitle)
+      if (this.PState.ieraksti.title != this.PState.newtitle) {
+        formdata.append('title', this.PState.newtitle)
       }
-      if (oldpdesc != newpdesc) {
-        formdata.append('pdesc', newpdesc)
+      if (this.PState.ieraksti.pdesc != this.PState.newpdesc) {
+        formdata.append('pdesc', this.PState.newpdesc)
       }
-      if (this.file != null) {
-        formdata.append('file', this.file)
+      if (this.PState.files != null) {
+        for (let i = 0; i < this.PState.files.length; i++) {
+          formdata.append('file', this.PState.files[i])
+        }
       }
-      formdata.append('idpost', this.Posttatus.idposts.toString())
+      formdata.append('idpost', this.editid.idposts)
+      formdata.append('replaceflag', 'false')
+      formdata.append('removeflag', 'false')
 
       fetch(`http://localhost:3000/api/editpost/`, {
         method: 'POST',
@@ -115,34 +138,104 @@ export default {
     },
 
     getpost() {
-      let id = this.Posttatus.idposts
+      let id = this.editid.idposts
       fetch(`http://localhost:3000/api/getpost/?postiid=${id}`, {
         method: 'GET'
       })
         .then((response) => response.json())
         .then((data) => {
-          this.IER = data.posts
-          /// nevareja vienkarši piešķirt data.posts jo  tas pieķšira refenci uz data.posts nevis kopeja datus
-          this.CIER = JSON.parse(JSON.stringify(this.IER))
+          this.PState.ieraksti = data.posts
         })
         .catch((error) => {
           console.error('Error:', error)
         })
-      this.Posttatus.status = true
+      if (this.Pstate.ieraksti != null) {
+        this.PState.viewstatus = true
+      }
     },
 
-    onFileSelected(event) {
-      this.file = event.target.files[0]
-      if (this.file) {
-        let img = document.getElementById('previewimg')
-        const reader = new FileReader()
-        reader.onload = (e) => {
-          if (e.target) {
-            img.src = e.target.result ?? ''
+    onMultipleFilesSelected(event) {
+      let filearr = []
+      for (let i = 0; i < event.target.files.length; i++) {
+        filearr.push(event.target.files[i])
+        this.renderpic(event.target.files[i])
+      }
+      this.PState.files = filearr
+    },
+
+    removefromupload(fileindex) {
+      let pics = this.PState.preview
+      let filearr = this.PState.files
+      if (fileindex != -1) {
+        pics.splice(fileindex, 1)
+        this.PState.preview = pics
+      }
+
+      if (this.PState.files != null) {
+        if (fileindex != -1) {
+          filearr.splice(fileindex, 1)
+          this.PState.files = filearr
+        }
+      }
+    },
+    renderpic(img) {
+      let imgarr = this.PState.preview
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        if (e.target) {
+          imgarr.push(e.target.result) ?? ''
+        }
+      }
+      reader.readAsDataURL(img)
+      console.log(imgarr)
+      this.PState.preview = imgarr
+    },
+
+    removechecked() {
+      console.log('removing checked')
+      let selectledelate = document.querySelectorAll('input[type=checkbox]:checked')
+      let deleteform = new FormData()
+      let removeflag = true
+      let replaceflag = false
+      let imgarr = []
+      if (selectledelate.length === 0) {
+        return
+      } else if (selectledelate.length > 1) {
+        for (let i = 0; i < selectledelate.length; i++) {
+          const elem = document.getElementById(selectledelate[i].id)
+          if (elem) {
+            removeflag = true
+            if (imgarr.includes(selectledelate[i].id)) {
+              continue
+            } else if (elem.classList.contains('multiimgcheck')) {
+              imgarr.push(selectledelate[i].id)
+            } else {
+              imgarr.push(selectledelate[i].id)
+              deleteform.append('imgpath', selectledelate[i].id)
+            }
           }
         }
-        reader.readAsDataURL(this.file)
+      } else if (selectledelate.length == 1) {
+        imgarr.push(selectledelate[0].id)
       }
+
+      if (imgarr != null) {
+        deleteform.append('imgarr', JSON.stringify(imgarr))
+      }
+      deleteform.append('replaceflag', replaceflag.toString())
+      deleteform.append('removeflag', removeflag.toString())
+      deleteform.append('idpost', editid.toString())
+      fetch(`http://localhost:3000/api/editpost/`, {
+        method: 'POST',
+        body: deleteform
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data)
+        })
+        .catch((error) => {
+          console.error('Error:', error)
+        })
     }
   }
 }
