@@ -43,7 +43,6 @@
 </template>
 
 <script setup>
-import axios from 'axios'
 import Multiimgcomp from './multiimgcomp.vue'
 </script>
 <script>
@@ -102,21 +101,19 @@ export default {
       formData1.append('searchtext', searchtextval)
       formData1.append('ammount', ammount)
       formData1.append('offset', offset)
-
-      const response2 = axios
-        .post('http://localhost:3000/search', formData1)
-
+      fetch('http://localhost:3000/search', {
+        method: 'post',
+        body: formData1
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.ieraksti = data.posts
+          this.getpostcount(data.count)
+        })
         .catch(function (error) {
           console.log(error)
         })
-        .then(function (response) {
-          console.log(response)
-          return response
-        })
-        .then((response) => {
-          this.ieraksti = response.data.posts
-          this.getpostcount(response.data.count)
-        })
+
       this.$emit('update')
     },
     async getpostcount(count) {
@@ -165,11 +162,16 @@ export default {
           deleteform.append('idlist', deleteselection[i])
           console.log('added' + deleteselection[i])
         }
-
-        axios.post(`http://localhost:3000/api/deleteposts/`, deleteform)
+        fetch('http://localhost:3000/api/deleteposts', {
+          method: 'post',
+          body: deleteform
+        })
       } else if (deleteselection.length == 1) {
         deleteform.append('idlist', deleteselection[0])
-        axios.post(`http://localhost:3000/api/deleteposts/`, deleteform)
+        fetch('http://localhost:3000/api/deleteposts', {
+          method: 'post',
+          body: deleteform
+        })
       }
 
       this.update()

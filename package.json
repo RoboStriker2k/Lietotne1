@@ -7,8 +7,6 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:e2e": "nightwatch tests/e2e/*",
-    "test:unit": "nightwatch src/**/__tests__/*",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
   },
@@ -21,15 +19,10 @@
     "@vitejs/plugin-vue": "^5.0.5",
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/test-utils": "^2.4.6",
-    "chromedriver": "^126.0.2",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.23.0",
-    "geckodriver": "^4.4.1",
-    "nightwatch": "^3.6.3",
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
-    "vite": "^5.3.1",
-    "vite-plugin-nightwatch": "^0.4.6",
-    "vite-plugin-vue-devtools": "^7.3.1"
+    "vite": "^5.3.1"
   }
 }

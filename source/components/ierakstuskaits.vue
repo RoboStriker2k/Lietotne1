@@ -6,8 +6,6 @@
 </template>
 
 <script setup>
-import axios from 'axios'
-
 const emit = defineEmits(['pskaits'])
 </script>
 
@@ -29,9 +27,21 @@ export default {
   },
   methods: {
     async getpostcount() {
-      const response = await axios.get(`http://localhost:3000/api/postscount/`)
-      this.postcount = response.data.posts[0].postscount
       //this.$emit(`pskaits`, this.postcount);
+      fetch(`http://localhost:3000/api/postscount/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          this.postcount = data.posts[0].postscount
+        })
+
+        .catch((error) => {
+          console.error('Error:', error)
+        })
     },
     getpost() {
       this.getpostcount()
