@@ -1,6 +1,6 @@
 <template>
-  <div id="gallerymarker">
-    <div class="gallery" v-if="gstate.statenr != -1">
+  <div id="gallerymarker" v-if="gstate.view">
+    <div class="gallery">
       <div id="galleryimg">
         <img :src="`${imgurl + gstate.currimg}`" />
       </div>
@@ -11,13 +11,12 @@
         <button style="float: 'right'" @click="close">iziet</button>
       </div>
       <div v-if="gstate.IER.imgarr != null">
-        <div class="album" v-for="img in gstate.IER.imgarr.images">
-          <div>
+        <div class="album">
+          <div v-for="img in gstate.IER.imgarr.images">
             <img :src="`${imgurl + img}`" v-on:click="setgstate({ statenr: 1, currimg: img })" />
           </div>
         </div>
       </div>
-      >
     </div>
   </div>
 </template>
@@ -26,17 +25,8 @@
 <script>
 export default {
   name: 'galleryview',
-  props: {
-    gs: {
-      idposts: 390,
-      viewable: false
-    }
-  },
-
-  setup() {
-    return {}
-  },
-
+  props: ['gs'],
+  emits: ['resetgallery'],
   data() {
     const imgurl = 'http://localhost:3000/getfoto/?file='
     const gstate = {
@@ -48,22 +38,27 @@ export default {
       pw: {
         images: ['']
       },
-      statenr: 0,
+      statenr: -1,
       currimg: '',
-      imageindex: 0
+      imageindex: 0,
+      view: false
     }
-    const test = {
-      lol: 0
-    }
+
     return {
       imgurl,
-      gstate,
-      lol
+      gstate
     }
   },
+  mounted() {
+    this.getpost()
+  },
   methods: {
+    show() {
+      this.getpost()
+      this.gstate.view = true
+    },
     setgstate(state) {
-      gstate = { ...this.gstate, ...state }
+      this.gstate = { ...this.gstate, ...state }
     },
     nextimg() {
       let index = this.gstate.imageindex
@@ -86,32 +81,35 @@ export default {
       }
     },
     getpost() {
-      fetch(`http://localhost:3000/api/getpost/?postiid=${this.gs.idposts}`, {
-        method: 'GET'
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          this.gstate = {
-            ...this.gstate,
-            IER: data.posts[0],
-            statenr: 1,
-            pw: data.posts[0].imgarr,
-            currimg: data.posts[0].imgarr.images[0]
-          }
-          this.gs.viewable = true
+      if (this.gs.idposts != 0)
+        fetch(`http://localhost:3000/api/getpost/?postiid=${this.gs.idposts}`, {
+          method: 'GET'
         })
-        .catch((error) => {
-          console.log(error)
-        })
+          .then((response) => response.json())
+          .then((data) => {
+            this.gstate = {
+              ...this.gstate,
+              IER: data.posts[0],
+              pw: data.posts[0].imgarr,
+              currimg: data.posts[0].imgarr.images[0]
+            }
+            if (this.gstate.IER.length > 0) {
+              this.gstate.statenr = 1
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
     },
     close() {
       this.gstate = {
         ...this.gstate,
         statenr: -1,
         imageindex: 0,
-        currimg: this.gstate.pw.images[0]
+        currimg: this.gstate.pw.images[0],
+        view: false
       }
-      this.resetgalery.emit()
+      this.resetgallery.emit()
     }
   }
 }

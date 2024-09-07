@@ -2,7 +2,7 @@
   <div id="postcntbox">
     <p>Atrasto ierakstu skaits datubāze: {{ searchstates.postcount }}</p>
   </div>
-  <Galleryview :gs="gs"></Galleryview>
+
   <div v-if="ieraksti.length == 0">Ierakstu nav</div>
   <div id="dzest">
     <button v-if="!searchstates.deletemarker & (ieraksti.length > 0)" v-on:click="deleteselector">
@@ -30,9 +30,7 @@
         <Multiimgcomp v-if="post.imgarr != null" :imgarr="post.imgarr" />
         <div><button class="btn" v-on:click="editfn(post.idposts)">Labot</button></div>
         <div v-if="post.imgpath != null || post.imgarr != null">
-          <button type="button" @click="setgallerystate({ postid: post.idposts, statenr: 1 })">
-            Skatīt
-          </button>
+          <button type="button" v-on:click="setgs(post.idposts)">Skatīt</button>
         </div>
       </div>
     </div>
@@ -49,7 +47,6 @@
 </template>
 
 <script setup>
-import Galleryview from './galleryview.vue'
 import Multiimgcomp from './multiimgcomp.vue'
 </script>
 <script>
@@ -57,9 +54,9 @@ var deleteselection = []
 
 export default {
   props: ['deleteselection'],
-  components: { Multiimgcomp, Galleryview },
+  components: { Multiimgcomp },
   expose: ['dosearch'],
-  emits: ['update', 'editfn'],
+  emits: ['update', 'editfn', 'gs'],
   setup() {
     return {}
   },
@@ -99,8 +96,8 @@ export default {
   },
 
   methods: {
-    setgallerystate(state) {
-      this.gs = { ...this.gs, ...state }
+    setgs(id) {
+      this.$emit('gs', id)
     },
     editfn(id) {
       this.$emit('editfn', id)
