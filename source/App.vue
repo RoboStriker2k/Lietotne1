@@ -22,10 +22,11 @@
       </div>
     </div>
     <div id="content">
+      <galleryview :gs="showgallery" ref="gview" @resetgallery="resetgs"></galleryview>
       <ierakstuskaits @pskaits="(pskaits) => (ierskaits = pskaits)" ref="ierskaits" />
       <p>Lietotnes ieraksti</p>
       <div id="dyncontent">
-        <ieraksts @update="Updateview" @editfn="editfn" ref="ier" />
+        <ieraksts @update="Updateview" @editfn="editfn" ref="ier" @gs="gs" />
         <editcomp :editid="editpostdata" ref="edit" @update="Updateview" />
       </div>
     </div>
@@ -43,15 +44,21 @@ import ierakstuskaits from './components/ierakstuskaits.vue'
 import search from './components/search.vue'
 import { nextTick, ref } from 'vue'
 import editcomp from './components/editcomp.vue'
+import galleryview from './components/galleryview.vue'
 </script>
 
 <script>
 const editpost = {
   idposts: 0
 }
+const gstate = {
+  idposts: 0
+}
 const editpostdata = ref(editpost)
 const searchtext = ref('')
 const showupload = ref(false)
+
+const showgallery = ref(gstate)
 export default {
   name: 'App',
 
@@ -59,7 +66,8 @@ export default {
     upl,
     ieraksts,
     ierakstuskaits,
-    editcomp
+    editcomp,
+    galleryview
   },
   setup() {
     const ierskaits = ref(0)
@@ -89,6 +97,14 @@ export default {
     },
     dosearch() {
       this.$refs.ier.dosearch()
+    },
+    gs(num) {
+      showgallery.value.idposts = num
+      console.log(num)
+      this.$refs.gview.show()
+    },
+    resetgs() {
+      showgallery.value.idposts = 0
     }
   }
 }
