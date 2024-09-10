@@ -1,8 +1,4 @@
 <template>
-  <div id="postcntbox">
-    <p>Atrasto ierakstu skaits datubāze: {{ searchstates.postcount }}</p>
-  </div>
-
   <div v-if="ieraksti.length == 0">Ierakstu nav</div>
   <div id="dzest">
     <button v-if="!searchstates.deletemarker & (ieraksti.length > 0)" v-on:click="deleteselector">
@@ -10,6 +6,9 @@
     </button>
     <button v-if="searchstates.deletemarker" v-on:click="deletefunction">Dzest ierakstus</button>
     <button v-if="searchstates.deletemarker" v-on:click="deleteselector">Atcelt dzešanu</button>
+  </div>
+  <div id="postcntbox">
+    <p>Atrasto ierakstu skaits datubāze: {{ searchstates.postcount }}</p>
   </div>
   <div class="iecontent">
     <div v-for="post in ieraksti">
@@ -28,9 +27,15 @@
           alt="Image"
         />
         <Multiimgcomp v-if="post.imgarr != null" :imgarr="post.imgarr" />
-        <div><button class="btn" v-on:click="editfn(post.idposts)">Labot</button></div>
-        <div v-if="post.imgpath != null || post.imgarr != null">
-          <button type="button" v-on:click="setgs(post.idposts)">Skatīt</button>
+        <div>
+          <button class="btn" v-on:click="editfn(post.idposts)">Labot</button>
+          <button
+            type="button"
+            v-if="post.imgpath != null || post.imgarr != null"
+            v-on:click="setgs(post.idposts)"
+          >
+            Skatīt
+          </button>
         </div>
       </div>
     </div>

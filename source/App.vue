@@ -23,8 +23,10 @@
     </div>
     <div id="content">
       <galleryview :gs="showgallery" ref="gview" @resetgallery="resetgs"></galleryview>
-      <ierakstuskaits @pskaits="(pskaits) => (ierskaits = pskaits)" ref="ierskaits" />
-      <p>Lietotnes ieraksti</p>
+      <div class="content-header">
+        <ierakstuskaits @pskaits="(pskaits) => (ierskaits = pskaits)" ref="ierskaits" />
+        <h1>Lietotnes ieraksti</h1>
+      </div>
       <div id="dyncontent">
         <ieraksts @update="Updateview" @editfn="editfn" ref="ier" @gs="gs" />
         <editcomp :editid="editpostdata" ref="edit" @update="Updateview" />
