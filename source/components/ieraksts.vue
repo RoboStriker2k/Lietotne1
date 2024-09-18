@@ -2,6 +2,7 @@
   <div id="postcntbox">
     <p>Atrasto ierakstu skaits datubāze: {{ searchstates.postcount }}</p>
   </div>
+
   <div v-if="ieraksti.length == 0">Ierakstu nav</div>
   <div id="dzest">
     <button v-if="!searchstates.deletemarker & (ieraksti.length > 0)" v-on:click="deleteselector">
@@ -28,6 +29,9 @@
         />
         <Multiimgcomp v-if="post.imgarr != null" :imgarr="post.imgarr" />
         <div><button class="btn" v-on:click="editfn(post.idposts)">Labot</button></div>
+        <div v-if="post.imgpath != null || post.imgarr != null">
+          <button type="button" v-on:click="setgs(post.idposts)">Skatīt</button>
+        </div>
       </div>
     </div>
   </div>
@@ -52,7 +56,7 @@ export default {
   props: ['deleteselection'],
   components: { Multiimgcomp },
   expose: ['dosearch'],
-  emits: ['update', 'editfn'],
+  emits: ['update', 'editfn', 'gs'],
   setup() {
     return {}
   },
@@ -70,14 +74,18 @@ export default {
       defaultbookmark: 0,
       postcount: 0
     }
-
+    const gs = {
+      idposts: 0,
+      viewable: false
+    }
     const ieraksti = []
     const imgsrc = ''
 
     return {
       ieraksti,
       imgsrc,
-      searchstates
+      searchstates,
+      gs
     }
   },
 
@@ -88,6 +96,9 @@ export default {
   },
 
   methods: {
+    setgs(id) {
+      this.$emit('gs', id)
+    },
     editfn(id) {
       this.$emit('editfn', id)
     },
