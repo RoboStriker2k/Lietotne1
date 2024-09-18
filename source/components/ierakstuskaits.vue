@@ -1,14 +1,12 @@
 <template>
   <div id="postcntbox">
     <p>Kopējais ierakstu skaits datubāze:</p>
-    <p id="postcount" @updateview="dosmth">{{ postcount }}</p>
+    <p id="postcount">{{ postcount }}</p>
   </div>
 </template>
-
 <script setup>
-const emit = defineEmits(['pskaits'])
+import { ref } from 'vue'
 </script>
-
 <script>
 export default {
   name: 'ierakstuskaits',
@@ -27,7 +25,6 @@ export default {
   },
   methods: {
     async getpostcount() {
-      //this.$emit(`pskaits`, this.postcount);
       fetch(`http://localhost:3000/api/postscount/`, {
         method: 'GET',
         headers: {
@@ -38,7 +35,6 @@ export default {
         .then((data) => {
           this.postcount = data.posts[0].postscount
         })
-
         .catch((error) => {
           console.error('Error:', error)
         })
