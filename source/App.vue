@@ -23,9 +23,9 @@
     </div>
     <div id="content">
       <galleryview :gs="showgallery" ref="gview" @resetgallery="resetgs"></galleryview>
-      <div id="content-header">
+      <div class="content-header">
         <ierakstuskaits ref="ierskaits" />
-        <p>Lietotnes ieraksti</p>
+        <h1>Lietotnes ieraksti</h1>
       </div>
       <div id="dyncontent">
         <ieraksts @update="Updateview" @editfn="editfn" ref="ier" @gs="gs" />
