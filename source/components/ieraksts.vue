@@ -1,9 +1,5 @@
 <template>
-  <div id="postcntbox">
-    <p>Atrasto ierakstu skaits datubāze: {{ searchstates.postcount }}</p>
-  </div>
 
-  <div v-if="ieraksti.length == 0">Ierakstu nav</div>
   <div id="dzest">
     <button v-if="!searchstates.deletemarker & (ieraksti.length > 0)" v-on:click="deleteselector">
       Ierakstu atlase
@@ -11,6 +7,10 @@
     <button v-if="searchstates.deletemarker" v-on:click="deletefunction">Dzest ierakstus</button>
     <button v-if="searchstates.deletemarker" v-on:click="deleteselector">Atcelt dzešanu</button>
   </div>
+    <div id="postcntbox">
+    <p>Atrasto ierakstu skaits datubāze: {{ searchstates.postcount }}</p>
+  </div>
+  <div v-if="ieraksti.length == 0">Ierakstu nav</div>
   <div class="iecontent">
     <div v-for="post in ieraksti">
       <div class="ieraksts" v-bind:id="post.idposts">
