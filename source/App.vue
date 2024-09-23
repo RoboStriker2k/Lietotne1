@@ -59,7 +59,7 @@ const gstate = {
 const editpostdata = ref(editpost)
 const searchtext = ref('')
 const showupload = ref(false)
-
+ const ierskaits = ref(0)
 const showgallery = ref(gstate)
 export default {
   name: 'App',
@@ -72,9 +72,8 @@ export default {
     galleryview
   },
   setup() {
-    const ierskaits = ref(0)
+   
     return {
-      ierskaits,
       showupload
     }
   },
@@ -90,11 +89,8 @@ export default {
       showupload.value = !showupload.value
     },
     async Updateview() {
-      try {
-        this.$refs.ierskaits.getpost()
-      } catch (error) {
-        console.log('ref get post err in appvue ')
-      }
+      this.$refs.ierskaits.getpost()
+
       await nextTick()
     },
     dosearch() {
