@@ -59,7 +59,7 @@ const gstate = {
 const editpostdata = ref(editpost)
 const searchtext = ref('')
 const showupload = ref(false)
- const ierskaits = ref(0)
+const ierskaits = ref(0)
 const showgallery = ref(gstate)
 export default {
   name: 'App',
@@ -72,7 +72,6 @@ export default {
     galleryview
   },
   setup() {
-   
     return {
       showupload
     }
@@ -90,7 +89,6 @@ export default {
     },
     async Updateview() {
       this.$refs.ierskaits.getpost()
-
       await nextTick()
     },
     dosearch() {
@@ -98,7 +96,6 @@ export default {
     },
     gs(num) {
       showgallery.value.idposts = num
-      console.log(num)
       this.$refs.gview.show()
     },
     resetgs() {
