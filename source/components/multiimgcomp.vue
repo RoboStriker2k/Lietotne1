@@ -18,7 +18,7 @@ export default {
     editstatus: Boolean
   },
   data() {
-    const imgurl = 'http://localhost:3000/getfoto/?file='
+    const imgurl = `http://${window.location.hostname}:3000/getfoto/?file=`
     return { imgurl }
   }
 }

@@ -129,7 +129,7 @@ export default {
       formdata.append('replaceflag', 'false')
       formdata.append('removeflag', 'false')
 
-      fetch(`http://localhost:3000/api/editpost/`, {
+      fetch('http://' + window.location.hostname + '3000/api/editpost/', {
         method: 'POST',
         body: formdata
       })
@@ -144,7 +144,7 @@ export default {
 
     getpost() {
       let id = this.editid.idposts
-      fetch(`http://localhost:3000/api/getpost/?postiid=${id}`, {
+      fetch('http://' + window.location.hostname + ':3000/api/getpost/?postiid=${id}', {
         method: 'GET'
       })
         .then((response) => response.json())
@@ -234,7 +234,7 @@ export default {
       deleteform.append('replaceflag', replaceflag.toString())
       deleteform.append('removeflag', removeflag.toString())
       deleteform.append('idpost', this.editid.idposts)
-      fetch(`http://localhost:3000/api/editpost/`, {
+      fetch('http://' + window.location.hostname + ':3000/api/editpost/', {
         method: 'POST',
         body: deleteform
       })

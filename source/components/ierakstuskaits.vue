@@ -25,7 +25,7 @@ export default {
   },
   methods: {
     async getpostcount() {
-      fetch(`http://localhost:3000/api/postscount/`, {
+      fetch(`http://${window.location.hostname}:3000/api/postscount/`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

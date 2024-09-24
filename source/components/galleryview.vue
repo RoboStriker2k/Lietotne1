@@ -28,7 +28,7 @@ export default {
   props: ['gs'],
   emits: ['resetgallery'],
   data() {
-    const imgurl = 'http://localhost:3000/getfoto/?file='
+    const imgurl = 'http://' + window.location.hostname + ':3000/getfoto/?file='
     const gstate = {
       IER: {
         imgarr: {
@@ -82,9 +82,12 @@ export default {
     },
     getpost() {
       if (this.gs.idposts != 0)
-        fetch(`http://localhost:3000/api/getpost/?postiid=${this.gs.idposts}`, {
-          method: 'GET'
-        })
+        fetch(
+          'http://' + window.location.hostname + ':3000/api/getpost/?postiid=${this.gs.idposts}',
+          {
+            method: 'GET'
+          }
+        )
           .then((response) => response.json())
           .then((data) => {
             this.gstate = {

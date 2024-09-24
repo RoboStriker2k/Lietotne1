@@ -105,7 +105,7 @@ export default {
           formData.append('file', this.uploadstate.files[i])
         }
       }
-      fetch('http://localhost:3000/api/addpost', {
+      fetch(`http://${window.location.hostname}:3000/api/addpost`, {
         method: 'post',
         body: formData
       }).catch(function (error) {

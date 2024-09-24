@@ -1,5 +1,4 @@
 <template>
-
   <div id="dzest">
     <button v-if="!searchstates.deletemarker & (ieraksti.length > 0)" v-on:click="deleteselector">
       Ierakstu atlase
@@ -7,7 +6,7 @@
     <button v-if="searchstates.deletemarker" v-on:click="deletefunction">Dzest ierakstus</button>
     <button v-if="searchstates.deletemarker" v-on:click="deleteselector">Atcelt dzešanu</button>
   </div>
-    <div id="postcntbox">
+  <div id="postcntbox">
     <p>Atrasto ierakstu skaits datubāze: {{ searchstates.postcount }}</p>
   </div>
   <div v-if="ieraksti.length == 0">Ierakstu nav</div>
@@ -24,7 +23,7 @@
         <P>{{ post.pdesc }}</P>
         <img
           v-if="post.imgpath != null"
-          :src="`http://localhost:3000/getfoto/${post.imgpath}`"
+          :src="`http://${window.location.hostname}:3000/getfoto/${post.imgpath}`"
           alt="Image"
         />
         <Multiimgcomp v-if="post.imgarr != null" :imgarr="post.imgarr" />
@@ -112,7 +111,7 @@ export default {
       formData1.append('searchtext', searchtextval)
       formData1.append('ammount', ammount)
       formData1.append('offset', offset)
-      fetch('http://localhost:3000/search', {
+      fetch(`http://${window.location.hostname}:3000/search`, {
         method: 'post',
         body: formData1
       })
@@ -173,13 +172,13 @@ export default {
           deleteform.append('idlist', deleteselection[i])
           console.log('added' + deleteselection[i])
         }
-        fetch('http://localhost:3000/api/deleteposts', {
+        fetch(`http://${window.location.hostname}:3000/api/deleteposts`, {
           method: 'post',
           body: deleteform
         })
       } else if (deleteselection.length == 1) {
         deleteform.append('idlist', deleteselection[0])
-        fetch('http://localhost:3000/api/deleteposts', {
+        fetch(`http://${window.location.hostname}:3000/api/deleteposts`, {
           method: 'post',
           body: deleteform
         })
