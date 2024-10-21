@@ -26,7 +26,7 @@
           <img
             v-if="item.imgpath != null"
             id="previewimg"
-            :src="`http://localhost:3000/getfoto/?file=${item.imgpath}`"
+            :src="'http://' + window.location.hostname + `:3000/getfoto/?file=${item.imgpath}`"
           />
           <Multiimgcomp v-if="item.imgarr != null" :imgarr="item.imgarr" :editstatus="true" />
           <div class="editgrid" v-if="PState.preview.length > 0" v-for="item in PState.preview">
@@ -144,7 +144,7 @@ export default {
 
     getpost() {
       let id = this.editid.idposts
-      fetch('http://' + window.location.hostname + ':3000/api/getpost/?postiid=${id}', {
+      fetch('http://' + window.location.hostname + ':3000/api/getpost/?postiid=' + id, {
         method: 'GET'
       })
         .then((response) => response.json())
